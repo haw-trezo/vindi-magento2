@@ -26,15 +26,14 @@ class SetOrderStatusOnPlace
 
     public function afterPlace(Payment $subject, $result)
     {
-        switch ($subject->getMethod()) {
-            case BankSlip::CODE:
-                $this->pendingStatus($subject);
-                break;
-            case Vindi::CODE:
-                $this->completeStatus($subject);
-                break;
+        $payment_status = $subject->getAdditionalInformation('vindi_bill_status'); 
+        if (Bill::REVIEW_STATUS === $payment_status
+            || Bill::REVIEW_STATUS === $payment_status
+            || BankSlip::CODE === $subject->getMethod()) {
+            $this->pendingStatus($subject);
+        } else {
+            $this->completeStatus($subject);
         }
-
         return $result;
     }
 

@@ -203,9 +203,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 || $body['payment_method_code'] === PaymentMethod::DEBIT_CARD
                 || $bill['status'] === Bill::PAID_STATUS
                 || $bill['status'] === Bill::REVIEW_STATUS
-                || $bill['charges'][0]['status'] === Bill::FRAUD_REVIEW_STATUS
+                || reset($bill['charges'])['status'] === Bill::FRAUD_REVIEW_STATUS
             ) {
                 $order->setVindiBillId($bill['id']);
+                $order->setAdditionalInformation('vindi_bill_status',
+                    reset($bill['charges'])['status'] || $bill['status']
+                );
                 return $bill['id'];
             }
             $this->bill->delete($bill['id']);
